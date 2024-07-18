@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR=$(dirname $0)
+pushd $SCRIPT_DIR
+
+./lecp_download
+if [ -z "$SKIP_VALIDATE" ]; then
+    ./validate
+fi
+
+./lecp_build
+./package-cli
+
+popd
+
+$SCRIPT_DIR/binary_size_check.sh

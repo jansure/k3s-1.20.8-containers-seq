@@ -1,0 +1,22 @@
+{
+	"linters": {
+		"disable-all": true,
+		"enable": [
+			"govet",
+			"golint",
+			"goimports",
+			"misspell",
+			"ineffassign",
+			"gofmt"
+		]
+	},
+	"run": {
+		"skip-dirs": [
+			"build", "/go/src/github.com/rancher/k3s/build"
+		],
+		"skip-files": [
+			"/zz_generated_"
+		],
+		"deadline": "5m"
+	}
+}

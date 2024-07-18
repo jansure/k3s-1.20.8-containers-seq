@@ -1,0 +1,17 @@
+#!/bin/bash
+set -e
+
+SCRIPT_DIR=$(dirname $0)
+pushd $SCRIPT_DIR
+
+./download
+if [ -z "$SKIP_VALIDATE" ]; then
+    ./validate
+fi
+
+./build
+./package
+
+popd
+
+$SCRIPT_DIR/binary_size_check.sh

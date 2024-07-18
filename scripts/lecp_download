@@ -1,0 +1,38 @@
+#!/bin/bash
+
+cd $(dirname $0)/..
+
+. ./scripts/version.sh
+
+ROOT_VERSION=v0.8.1
+TRAEFIK_VERSION=1.81.0
+CHARTS_DIR=build/static/charts
+DATA_DIR=build/data
+
+umask 022
+rm -rf ${CHARTS_DIR}
+mkdir -p ${CHARTS_DIR}
+mkdir -p ${DATA_DIR}
+
+cat downloads/lecp-mec-k3s/k3s-root-${ARCH}-${ROOT_VERSION}.tar.gz | tar xazf -
+
+tar -xaf downloads/lecp-mec-k3s/runc-v1.0.0-rc95.tgz -C bin
+code=$?
+if [ $code -ne 0 ]; then
+  echo "Error: Failed to download runc!"
+  exit $code
+fi
+
+
+TRAEFIK_FILE=traefik-${TRAEFIK_VERSION}.tgz
+
+cp downloads/lecp-mec-k3s/${TRAEFIK_FILE} ${CHARTS_DIR}/${TRAEFIK_FILE}
+code=$?
+
+if [ $code -ne 0 ]; then
+  echo "Error: Failed to download Traefik Helm chart!"
+  exit $code
+fi
+
+tar -xaf downloads/lecp-mec-k3s/cni.tgz -C bin/
+cp scripts/wg-add.sh bin/aux/

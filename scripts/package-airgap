@@ -1,0 +1,25 @@
+#!/bin/bash
+set -e -x
+
+cd $(dirname $0)/..
+
+. ./scripts/version.sh
+
+airgap_image_file='scripts/airgap/image-list.txt'
+images=$(cat "${airgap_image_file}")
+if [ "`arch`" == "aarch64" ]; then
+  xargs -n1 docker pull --platform linux/arm64 <<< "${images}"
+elif [ "`arch`" == "x86_64" ]; then
+  xargs -n1 docker pull --platform linux/amd64 <<< "${images}"
+fi
+mkdir -p ./dist/artifacts/
+docker save ${images} -o dist/artifacts/k3s-airgap-images-${ARCH}.tar
+cp "${airgap_image_file}" dist/artifacts/k3s-images.txt
+cd ./dist/artifacts/
+if [ "`arch`" == "aarch64" ]; then
+  cp k3s-airgap-images-arm64.tar /k3s-airgap-images.tar
+  #jf rt u --server-id=${artifactType} k3s-airgap-images-arm64.tar lecp-mec-k3s/${artifactType}/${artifactVersion}/`arch`/k3s-airgap-images-arm64.tar
+elif [ "`arch`" == "x86_64" ]; then
+  cp k3s-airgap-images-amd64.tar /k3s-airgap-images.tar
+  #jf rt u --server-id=${artifactType} k3s-airgap-images-amd64.tar lecp-mec-k3s/${artifactType}/${artifactVersion}/`arch`/k3s-airgap-images-amd64.tar
+fi

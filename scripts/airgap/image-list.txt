@@ -1,0 +1,9 @@
+harbor.xxx.com/base/rancher/coredns-coredns:1.8.0
+harbor.xxx.com/base/rancher/klipper-helm:v0.4.3
+harbor.xxx.com/base/rancher/klipper-lb:v0.1.2
+harbor.xxx.com/base/rancher/library-busybox:1.32.1
+harbor.xxx.com/base/rancher/library-traefik:1.7.19
+harbor.xxx.com/base/rancher/local-path-provisioner:v0.0.19
+harbor.xxx.com/base/rancher/metrics-server:v0.3.6
+harbor.xxx.com/base/rancher/pause:3.1
+

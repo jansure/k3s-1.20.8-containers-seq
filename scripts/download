@@ -1,0 +1,44 @@
+#!/bin/bash
+
+cd $(dirname $0)/..
+
+. ./scripts/version.sh
+
+RUNC_VERSION=v1.0.0-rc95
+ROOT_VERSION=v0.8.1
+TRAEFIK_VERSION=1.81.0
+CHARTS_DIR=build/static/charts
+RUNC_DIR=build/src/github.com/opencontainers/runc
+DATA_DIR=build/data
+
+umask 022
+rm -rf ${CHARTS_DIR}
+rm -rf ${RUNC_DIR}
+mkdir -p ${CHARTS_DIR}
+mkdir -p ${DATA_DIR}
+
+#curl --compressed -sfL https://github.com/k3s-io/k3s-root/releases/download/${ROOT_VERSION}/k3s-root-${ARCH}.tar | tar xf -
+curl --compressed -sfL http://jfrog.lenovo.com/artifactory/lecp-mec-k3s-root/release/${ROOT_VERSION}/k3s-root-${ARCH}.tar | tar xf -
+#git clone --depth=1 https://github.com/opencontainers/runc ${RUNC_DIR} || true
+#git clone --depth=1 git@igitlab.lenovo.com:lecp/mec/opencontainers/runc.git ${RUNC_DIR} || true
+curl --compressed -sfL http://jfrog.lenovo.com/artifactory/lecp-mec-opencontainers-runc/latest/latest/runc.tar.gz | tar zxf -
+rm -rf runc/.git
+mkdir -p build/src/github.com/opencontainers && cp -rf runc ${RUNC_DIR}/
+pushd ${RUNC_DIR}
+git fetch --all --tags
+git checkout ${RUNC_VERSION} -b k3s
+popd
+
+TRAEFIK_FILE=traefik-${TRAEFIK_VERSION}.tgz
+#TRAEFIK_URL=https://charts.helm.sh/stable/packages/${TRAEFIK_FILE}
+TRAEFIK_URL=http://jfrog.lenovo.com/artifactory/lecp-traefik/release/${TRAEFIK_VERSION}/traefik.tgz
+echo "Downloading Traefik Helm chart from ${TRAEFIK_URL}"
+curl -sfL ${TRAEFIK_URL} -o ${CHARTS_DIR}/${TRAEFIK_FILE}
+code=$?
+
+if [ $code -ne 0 ]; then
+  echo "Error: Failed to download Traefik Helm chart!"
+  exit $code
+fi
+
+cp scripts/wg-add.sh bin/aux/
